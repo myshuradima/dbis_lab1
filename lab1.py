@@ -1,37 +1,8 @@
 # -*- coding: utf8 -*-
 import psycopg2
-import urllib.request
-import py7zr
 import os
 from queries import cteate_table, insert_string, ball_list, select_query
-N = 2000
-
-conn = psycopg2.connect(
-    host='localhost',
-    port=5432,
-    dbname='postgres',
-    user='postgres',
-    password='postgres'
-)
-cur = conn.cursor()
-cur.execute(cteate_table)
-cur.close()
-conn.commit()
-conn.close()
-#way1 = 'https://zno.testportal.com.ua/yearstat/uploads/OpenDataZNO2019.7z'
-#way2 = 'https://zno.testportal.com.ua/yearstat/uploads/OpenDataZNO2020.7z'
-#urllib.request.urlretrieve(way1, '2019.7z')
-#urllib.request.urlretrieve(way2, '2020.7z')
-
-#with py7zr.SevenZipFile('2019.7z', 'r') as file:
-#    file.extractall()
-#with py7zr.SevenZipFile('2020.7z', 'r') as file:
-#    file.extractall()
-
-
-
-
-print(len(os.listdir(path="dir")))
+from config import dbname, password, port, username, host, N, way1, way2
 
 
 def func1(str_list):
@@ -56,8 +27,20 @@ counter1 = 0
 
 
 def upload_files_to_db():
+    conn = psycopg2.connect(
+        host=host,
+        port=port,
+        dbname=dbname,
+        user=username,
+        password=password
+    )
+    cur = conn.cursor()
+    cur.execute(cteate_table)
+    cur.close()
+    conn.commit()
+    conn.close()
     if not os.listdir(path="dir"):
-        with open('Odata2019File.csv', encoding='cp1251') as file:
+        with open(way1, encoding='cp1251') as file:
             a = file.readline()
             print(a)
             i = 0
@@ -76,7 +59,7 @@ def upload_files_to_db():
                     f = open('dir/partfile1_' + str(k) + '.csv', 'w')
             f.close()
 
-        with open('Odata2020File.csv', encoding='cp1251') as file:
+        with open(way2, encoding='cp1251') as file:
             a = file.readline()
             print(a)
             i = 0
@@ -96,11 +79,11 @@ def upload_files_to_db():
             f.close()
     try:
         conn = psycopg2.connect(
-            host='localhost',
-            port=5432,
-            dbname='postgres',
-            user='postgres',
-            password='postgres'
+            host=host,
+            port=port,
+            dbname=dbname,
+            user=username,
+            password=password
         )
         for el in os.listdir(path="dir"):
             print("Uploading:", el)
@@ -140,11 +123,11 @@ def upload_files_to_db():
 
 def select_from_db():
     conn = psycopg2.connect(
-        host='localhost',
-        port=5432,
-        dbname='postgres',
-        user='postgres',
-        password='postgres'
+        host=host,
+        port=port,
+        dbname=dbname,
+        user=username,
+        password=password
     )
     cur = conn.cursor()
     cur.execute(select_query)
@@ -154,16 +137,22 @@ def select_from_db():
     conn.commit()
     conn.close()
     with open("result.csv", 'w') as file:
+        file.write("Область, Середній бал ЗНО, Середній бал ДПА, Рік\n")
         for el in records:
+            print(el)
             new_string = ""
             new_string = new_string + '"' + el[0] + '",' + str(round(el[1], 2)) + ',' + \
                          str(round(el[2], 2)) + ',' + str(el[3] + '\n')
             file.write(new_string)
 
 
-a = input("press u to upload files to db and s to select")
+if not os.path.exists(path="dir"):
+    os.mkdir(path="dir")
+a = input("press u to upload files to db and s to select data from db ")
 if a == 'u':
-    upload_files_to_db()
+    b = upload_files_to_db()
+    if b == 1:
+        select_from_db()
 else:
     select_from_db()
 
