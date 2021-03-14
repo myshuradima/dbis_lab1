@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-cteate_table = """CREATE TABLE IF NOT EXISTS odata1(
+cteate_table = """CREATE TABLE IF NOT EXISTS odata(
 OUTID VARCHAR(255) PRIMARY KEY,
 Birth VARCHAR(255),
 SEXTYPENAME VARCHAR(255),
@@ -130,7 +130,7 @@ examdate VARCHAR(255));"""
 
 ball_list = [18, 19, 20, 29, 30, 31, 39, 40, 41, 49, 50, 51, 59, 60, 61, 69, 70, 71, 79, 80, 81, 88, 89, 91, 98, 99, 101, 108, 109, 111, 118, 119, 121]
 
-insert_string = """INSERT INTO odata1(
+insert_string = """INSERT INTO odata(
 OUTID
 ,Birth
 ,SEXTYPENAME
